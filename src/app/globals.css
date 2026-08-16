@@ -1,26 +1,200 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* Surfaces — the site reads as a white site; ivory and sand only band it. */
+  --color-paper: #ffffff;
+  --color-ivory: #faf9f6;
+  --color-sand: #f3efe7;
+
+  /* Ink */
+  --color-navy: #102a43;
+  --color-charcoal: #1f2933;
+  /* Two points darker than the brief's #667085 so body copy still clears
+     WCAG AA (4.5:1) against the sand band, not only against white. */
+  --color-muted: #5c6675;
+
+  /* Accent */
+  --color-ocean: #176b87;
+  --color-deepsea: #0b4f6c;
+  /* Gold splits in two: the leaf tone for rules, icons and text on navy…  */
+  --color-gold: #b89b5e;
+  /* …and a darker ink for gold *text* on light grounds, which the leaf tone
+     cannot carry (2.7:1). This clears AA on white (5.5:1) and on sand (4.8:1). */
+  --color-gold-ink: #7e6529;
+
+  /* Hairlines — warm, never neutral grey */
+  --color-rule: #e7e2d8;
+  --color-rule-strong: #d5cec0;
+
+  --font-display: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  --font-arabic: var(--font-naskh), "Noto Naskh Arabic", serif;
+
+  --breakpoint-xs: 30rem;
+  --breakpoint-3xl: 100rem;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+@layer base {
+  * {
+    min-width: 0;
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    scroll-padding-top: 6.5rem;
+  }
+
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-charcoal);
+    font-family: var(--font-sans);
+    font-synthesis-weight: none;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background-color: color-mix(in oklab, var(--color-ocean) 18%, white);
+    color: var(--color-navy);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-ocean);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    color: var(--color-navy);
+    font-weight: 400;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  [dir="rtl"],
+  .arabic {
+    font-family: var(--font-arabic);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  /* ── The one repeated structural device: the printed-menu numeral ───────── */
+  .numeral {
+    font-family: var(--font-display);
+    font-variant-numeric: tabular-nums lining-nums;
+    color: var(--color-gold-ink);
+    letter-spacing: 0.02em;
+    line-height: 1;
+  }
+
+  /* Small uppercase label used above headings and beside rules. */
+  .eyebrow {
+    font-family: var(--font-sans);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-ocean);
+  }
+
+  .shell {
+    width: 100%;
+    max-width: 82.5rem;
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+
+  @media (min-width: 48rem) {
+    .shell {
+      padding-inline: 2.5rem;
+    }
+  }
+
+  @media (min-width: 80rem) {
+    .shell {
+      padding-inline: 3.5rem;
+    }
+  }
+
+  /* Hairline that starts gold and dissolves — used to close sections. */
+  .rule-fade {
+    height: 1px;
+    background: linear-gradient(
+      to right,
+      var(--color-gold),
+      var(--color-rule) 22%,
+      transparent
+    );
+  }
+}
+
+@layer utilities {
+  .link-underline {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 0% 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition: background-size 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .link-underline:hover,
+  .link-underline:focus-visible {
+    background-size: 100% 1px;
+  }
+
+  /* Scroll reveal. Elements start hidden only once JS confirms it can observe
+     them, so the page is fully readable with JS disabled. */
+  [data-reveal] {
+    opacity: 1;
+  }
+
+  html.js [data-reveal] {
+    opacity: 0;
+    transform: translateY(18px);
+    transition:
+      opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+
+  html.js [data-reveal="in"] {
+    opacity: 1;
+    transform: none;
+  }
+
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  html.js [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
